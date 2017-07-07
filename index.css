@@ -1,0 +1,33 @@
+*{
+  box-sizing: border-box;
+}
+
+body{
+  background-color: black;
+  margin: 0;
+  padding: 0;
+}
+
+.container{
+ width: 900px;
+ height: 510px;
+ background-color: gray;
+ margin: 0 auto;
+ border: 10px green solid;
+ border-radius: 10px;
+
+}
+
+.yellow{
+  background-color: yellow;
+}
+
+.row{
+  height: 10px
+}
+.square{
+  width: 10px;
+  height: inherit;
+  border: 1px white solid;
+  background-color: blue;
+}
