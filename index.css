@@ -9,8 +9,8 @@ body{
 }
 
 .container{
- width: 900px;
- height: 510px;
+ width: 920px;
+ height: 520px;
  background-color: gray;
  margin: 0 auto;
  border: 10px green solid;
@@ -23,11 +23,17 @@ body{
 }
 
 .row{
-  height: 10px
+  height: 20px;
+  margin: 0;
+  padding: 0;
 }
 .square{
-  width: 10px;
+  width: 20px;
   height: inherit;
+  display: inline-block;
+}
+
+.active{
+  border-radius: 50px;
   border: 1px white solid;
-  background-color: blue;
 }
