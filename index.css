@@ -12,8 +12,8 @@ body{
  width: 920px;
  height: 520px;
  background-color: gray;
- margin: 0 auto;
- border: 10px green solid;
+ margin: 50px auto;
+ border: 10px DarkGreen solid;
  border-radius: 10px;
 
 }
@@ -33,7 +33,12 @@ body{
   display: inline-block;
 }
 
-.active{
+.snake{
+  background-color: green;
+}
+
+.food{
+  background-color: red;
   border-radius: 50px;
   border: 1px white solid;
 }

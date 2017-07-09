@@ -1,76 +1,170 @@
 $(document).ready(function() {
-  var cw = $(".container").width();
-  var ch = $(".container").height();
+  var cw = $(".container").width()/20;
+  var ch = $(".container").height()/20;
+  var colorProgression = ["DarkGreen", "SpringGreen","YellowGreen","Gold","DarkOrange","OrangeRed","Crimson","DarkRed"]
   var createGrid = function(cw, ch){
     var $container = $(".container")
-    for (i = 0; i < ch/20; i++){
+    for (i = 0; i < ch; i++){
       var $newRow = $("<div class = 'row'></div>");
-      for (j = 0; j < cw/20; j++){
+      for (j = 0; j < cw; j++){
         $newRow.append("<div class = 'square' id = r" + i + "c"+ j + "></div>");
       };
       $container.append($newRow);
     };
   };
-  var makeActive = function(row, column){
+  var makeSnake = function(row, column){
     var id = "#r" +row + "c " + column;
-    console.log(id);
-    $(id).addClass('active');
+    $(id).addClass('snake');
   };
 
-  var player = {
-    BGcolor : "green",
+  function segment(row, column){
+    this.row = row;
+    this.col = column;
+    this.draw = function(){
+        var $square = $("#r" + this.row + "c" + this.col);
+        $square.addClass('snake');
+      };
+    this.remove = function() {
+        var $square = $("#r" + this.row + "c" + this.col);
+        $square.removeClass('snake');
+      };
+  }
+
+  var food = {
+    row : 0,
+    col : 0,
+    newLocal : function(){
+      do {
+        this.row = Math.floor(Math.random()*ch);
+        this.col = Math.floor(Math.random()*cw);
+      }
+      while(this.inSnake());
+    },
+
+    inSnake : function(){
+      var $square = $("#r" + this.row + "c" + this.col);
+      if($square.hasClass('snake')){return true;}
+      return false;
+    },
+
+    draw : function(){
+        var $square = $("#r" + this.row + "c" + this.col);
+        $square.addClass('food');
+    },
+
+    remove : function() {
+        var $square = $("#r" + this.row + "c" + this.col);
+        $square.removeClass('food');
+    }
+  };
+
+  var snake = {
     row : 2,
     col : 3,
-    draw : function(){
+    snakeSegs : [],
+    moveList : [],
+    length : 3,
+    nextLevel : 7,
+    atLevel: 0,
+    speed: 100,
+    direction : 'R',
+    addSegement : function(){
+      var newSegment = new segment(this.row, this.col);
+      this.snakeSegs.push(newSegment);
+      if(this.length <  this.snakeSegs.length){
+        var oldSegment = this.snakeSegs.shift();
+        oldSegment.remove();
+        delete oldSegment;
+      }
+    },
+    drawAll : function(){
+      for(i = 0; i < this.snakeSegs.length; i++){
+        this.snakeSegs[i].draw();
+      }
+    },
+
+    legalSquare : function(){
+      //if(this.row < 0 || this.row >= ch){return false;}
+      //if(this.col<0 || this.col >= cw){return false;}
       var $square = $("#r" + this.row + "c" + this.col);
-      $square.css("background-color", this.BGcolor);
-      $square.addClass('active');
+      if($square.hasClass('snake')){return false;}
+      return true;
     },
-    remove : function(){
+
+    gotFood : function(){
       var $square = $("#r" + this.row + "c" + this.col);
-      $square.css("background-color", "transparent");
-      $square.removeClass('active');
+      if($square.hasClass('food')){return true;}
+      return false;
     },
-    moveLeft : function(){
-      this.remove();
-      this.col -= 1;
-      this.draw();
+
+    scoreFood : function(){
+      this.length += 1;
+      food.remove();
+      food.newLocal();
+      food.draw();
     },
-    moveRight : function(){
-      this.remove();
-      this.col += 1;
-      this.draw();
+    upLevel : function(){
+      this.nextLevel += 7;
+      this.speed *= .75;
+      this.atLevel += 1;
+      $(".container").css("border-color",colorProgression[this.atLevel]);
     },
-    moveUp : function(){
-      this.remove();
-      this.row -= 1;
-      this.draw();
-    },
-    moveDown : function(){
-      this.remove();
-      this.row += 1;
-      this.draw();
-    },
+
+    move : function(loop){
+      switch(this.direction){
+        case 'R':
+          this.col += 1;
+          if(this.col >= cw){this.col = 0}
+          break;
+        case 'L':
+          this.col -= 1;
+          if(this.col < 0){this.col = cw}
+          break;
+        case 'U':
+          this.row -= 1;
+          if(this.row < 0){this.row = ch}
+          break;
+        case 'D':
+          this.row += 1;
+          if(this.row >= ch){this.row = 0}
+          break;
+      }
+      if(this.legalSquare()){
+        if(this.gotFood()){this.scoreFood()}
+        this.addSegement();
+        this.drawAll();
+      }
+      else{
+        clearInterval(loop);
+      }
+      if(this.length > this.nextLevel){
+        clearInterval(loop);
+        this.upLevel();
+        var gameLoop = setInterval(function(){snake.move(gameLoop);},snake.speed);
+      }
+    }
   };
+
   createGrid(cw,ch);
-  player.draw();
   $(document).on('keydown',(function (event){
     switch(event.which){
       case 38:
-        console.log("moving up");
-        player.moveUp();
+        if(snake.direction !== 'D'){snake.direction = 'U';}
         break;
       case 40:
-        player.moveDown();
+      if(snake.direction !== 'U'){snake.direction = 'D';};
         break;
       case 37:
-        player.moveLeft();
+      if(snake.direction !== 'R'){snake.direction = 'L';}
         break;
       case 39:
-        player.moveRight();
+      if(snake.direction !== 'L'){snake.direction = 'R';}
         break;
       default:
         break;
     }
   }));
+  food.newLocal();
+  food.draw();
+  var gameLoop = setInterval(function(){snake.move(gameLoop);},snake.speed);
 });
