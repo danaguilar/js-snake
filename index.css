@@ -18,6 +18,25 @@ body{
 
 }
 
+.right-head{
+  border-top-right-radius: 50px;
+  border-bottom-right-radius: 50px;
+}
+
+.down-head{
+  border-bottom-left-radius: 50px;
+  border-bottom-right-radius: 50px;
+}
+
+.left-head{
+  border-bottom-left-radius: 50px;
+  border-top-left-radius: 50px;
+}
+
+.up-head{
+  border-top-left-radius: 50px;
+  border-top-right-radius: 50px;
+}
 .yellow{
   background-color: yellow;
 }

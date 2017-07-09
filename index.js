@@ -28,6 +28,33 @@ $(document).ready(function() {
         var $square = $("#r" + this.row + "c" + this.col);
         $square.removeClass('snake');
       };
+
+    this.makeHead =  function(direction) {
+        var $square = $("#r" + this.row + "c" + this.col);
+        switch(direction){
+          case 'U':
+            $square.addClass('up-head');
+            break;
+          case 'D':
+            $square.addClass('down-head');
+            break;
+          case 'L':
+            $square.addClass('left-head');
+            break;
+          case 'R':
+            $square.addClass('right-head');
+            break;
+
+        }
+      };
+
+    this.removeHead = function() {
+        var $square = $("#r" + this.row + "c" + this.col);
+        $square.removeClass('right-head');
+        $square.removeClass('left-head');
+        $square.removeClass('up-head');
+        $square.removeClass('down-head');
+      };
   }
 
   var food = {
@@ -56,6 +83,7 @@ $(document).ready(function() {
         var $square = $("#r" + this.row + "c" + this.col);
         $square.removeClass('food');
     }
+
   };
 
   var snake = {
@@ -97,6 +125,11 @@ $(document).ready(function() {
       return false;
     },
 
+    updateHead : function(){
+      this.snakeSegs[this.length-1].makeHead(this.direction);
+      this.snakeSegs[this.length-2].removeHead();
+    },
+
     scoreFood : function(){
       this.length += 1;
       food.remove();
@@ -109,8 +142,26 @@ $(document).ready(function() {
       this.atLevel += 1;
       $(".container").css("border-color",colorProgression[this.atLevel]);
     },
-
+    updateDirection : function(){
+      if(this.moveList.length > 0){
+        switch(this.moveList.shift()){
+          case 'D':
+            if(this.direction !== 'U'){this.direction = 'D';}
+            break;
+          case 'U':
+            if(this.direction !== 'D'){this.direction = 'U';}
+            break;
+          case 'R':
+            if(this.direction !== 'L'){this.direction = 'R';}
+            break;
+          case 'L':
+            if(this.direction !== 'R'){this.direction = 'L';}
+            break;
+        }
+      }
+    },
     move : function(loop){
+      this.updateDirection();
       switch(this.direction){
         case 'R':
           this.col += 1;
@@ -132,6 +183,7 @@ $(document).ready(function() {
       if(this.legalSquare()){
         if(this.gotFood()){this.scoreFood()}
         this.addSegement();
+        this.updateHead();
         this.drawAll();
       }
       else{
@@ -149,16 +201,16 @@ $(document).ready(function() {
   $(document).on('keydown',(function (event){
     switch(event.which){
       case 38:
-        if(snake.direction !== 'D'){snake.direction = 'U';}
+        snake.moveList.push('U');
         break;
       case 40:
-      if(snake.direction !== 'U'){snake.direction = 'D';};
+        snake.moveList.push('D');
         break;
       case 37:
-      if(snake.direction !== 'R'){snake.direction = 'L';}
+        snake.moveList.push('L');
         break;
       case 39:
-      if(snake.direction !== 'L'){snake.direction = 'R';}
+        snake.moveList.push('R');
         break;
       default:
         break;
